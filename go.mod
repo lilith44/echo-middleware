@@ -1,4 +1,4 @@
-module github.com/echo-middleware
+module github.com/lilith44/echo-middleware
 
 go 1.18
 
