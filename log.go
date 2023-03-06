@@ -20,7 +20,7 @@ func Log() echo.MiddlewareFunc {
 			req := c.Request()
 			rsp := c.Response()
 
-			format := "\nRequestID: %s\nRequest:   %s %s\nStatus:    %d\nError:     %s\nSize:      %d\nLatency:   %s\nRemoteIP:  %s\nUserAgent: %s\n"
+			format := `{"request_id": "%s", "request": "%s %s", "status": %d, "error": "%s", "size": %d, "latency": "%s", "remote_ip": "%s", "user_agent": "%s"}`
 
 			requestId := req.Header.Get(echo.HeaderXRequestID)
 			if requestId == "" {
