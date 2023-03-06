@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/lilith44/easy"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func Log(logger *zap.Logger) echo.MiddlewareFunc {
+func Log() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			start := time.Now()
@@ -40,9 +41,9 @@ func Log(logger *zap.Logger) echo.MiddlewareFunc {
 			fields = append(fields, zap.String("request_id", requestId))
 
 			if rsp.Status >= http.StatusMultipleChoices {
-				logger.Error("", fields...)
+				c.Logger().Error(easy.ToAnySlice(fields)...)
 			} else {
-				logger.Info("", fields...)
+				c.Logger().Info(easy.ToAnySlice(fields)...)
 			}
 
 			return nil
