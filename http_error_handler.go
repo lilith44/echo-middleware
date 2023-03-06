@@ -14,7 +14,15 @@ type HttpErrorHandlerOptions struct {
 	DefaultErrorMessage string
 }
 
-func HttpErrorHandler(options *HttpErrorHandlerOptions) func(err error, c echo.Context) {
+func NewHttpErrorHandlerOptions(middlewareErrorCode int, defaultErrorCode int, defaultErrorMessage string) *HttpErrorHandlerOptions {
+	return &HttpErrorHandlerOptions{
+		MiddlewareErrorCode: middlewareErrorCode,
+		DefaultErrorCode:    defaultErrorCode,
+		DefaultErrorMessage: defaultErrorMessage,
+	}
+}
+
+func HttpErrorHandler(options *HttpErrorHandlerOptions) echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
 		if c.Response().Committed {
 			return

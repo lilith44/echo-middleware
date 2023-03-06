@@ -1,14 +1,10 @@
 package echo_middleware
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/lilith44/easy"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 func Log() echo.MiddlewareFunc {
@@ -24,26 +20,42 @@ func Log() echo.MiddlewareFunc {
 			req := c.Request()
 			rsp := c.Response()
 
-			fields := []zapcore.Field{
-				zap.Int("status", rsp.Status),
-				zap.String("request", fmt.Sprintf("%s %s", req.Method, req.RequestURI)),
-				zap.Error(err),
-				zap.Int64("size", rsp.Size),
-				zap.String("latency", time.Since(start).String()),
-				zap.String("remote_ip", c.RealIP()),
-				zap.String("user_agent", req.UserAgent()),
-			}
+			format := "\nRequestID: %s\nRequest:   %s %s\nStatus:    %d\nError:     %s\nSize:      %d\nLatency:   %s\nRemoteIP:  %s\nUserAgent: %s\n"
 
 			requestId := req.Header.Get(echo.HeaderXRequestID)
 			if requestId == "" {
 				requestId = rsp.Header().Get(echo.HeaderXRequestID)
 			}
-			fields = append(fields, zap.String("request_id", requestId))
+
+			var e string
+			if err != nil {
+				e = err.Error()
+			}
 
 			if rsp.Status >= http.StatusMultipleChoices {
-				c.Logger().Error(easy.ToAnySlice(fields)...)
+				c.Logger().Errorf(
+					format,
+					requestId,
+					req.Method, req.RequestURI,
+					rsp.Status,
+					e,
+					rsp.Size,
+					time.Since(start).String(),
+					c.RealIP(),
+					req.UserAgent(),
+				)
 			} else {
-				c.Logger().Info(easy.ToAnySlice(fields)...)
+				c.Logger().Infof(
+					format,
+					requestId,
+					req.Method, req.RequestURI,
+					rsp.Status,
+					e,
+					rsp.Size,
+					time.Since(start).String(),
+					c.RealIP(),
+					req.UserAgent(),
+				)
 			}
 
 			return nil
