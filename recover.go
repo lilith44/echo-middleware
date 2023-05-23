@@ -12,7 +12,7 @@ func Recover() echo.MiddlewareFunc {
 		return func(c echo.Context) (err error) {
 			defer func() {
 				if r := recover(); r != nil {
-					c.Logger().Info(fmt.Sprintf("[Panic Recover]\n%s", debug.Stack()))
+					c.Logger().Info(fmt.Sprintf("[Panic Recover]%s\n%s", r, debug.Stack()))
 
 					err = fmt.Errorf("%s", r)
 				}
